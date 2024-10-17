@@ -18,10 +18,11 @@ use App\Repositories\SharedTodoRepository;
 use App\Repositories\TodoRepository;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TodoController extends Controller
 {
-
+    use AuthorizesRequests;
     private $todoRepository;
     private $sharedTodoRepository;
     private $sharedTodoEmailRepository;
@@ -110,7 +111,7 @@ class TodoController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         $todo = $this->todoRepository->findByUserAndId(auth()->id(), $id);
-
+        $this->authorize('update', $todo);
         $this->todoRepository->update($todo, [
             'name' => $request->getName(),
             'description' => $request->getDescription(),
@@ -172,9 +173,9 @@ class TodoController extends Controller
 
     public function completed(CompletedRequest $request, $id)
     {
-
         /** @var Todo $todo */
         $todo = auth()->user()->todos()->findOrFail($id);
+        $this->authorize('update', $todo);
 
         $todo->setIsCompleted($request->isCompleted());
         $todo->save();
@@ -190,6 +191,7 @@ class TodoController extends Controller
     public function destroy($id)
     {
         $todo = $this->todoRepository->findByUserAndId(auth()->id(), $id);
+        $this->authorize('delete', $todo);
         $sharedTodo = $this->sharedTodoRepository->findByTodoId($todo->id);
 
         if ($sharedTodo) {
@@ -210,6 +212,7 @@ class TodoController extends Controller
     public function restore($id)
     {
         $todo = auth()->user()->todos()->withTrashed()->findOrFail($id);
+        $this->authorize('restore', $todo);
         $this->todoRepository->restore($todo);
 
         /** @var User $user */
