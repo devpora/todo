@@ -63,12 +63,33 @@ const handleEnter = (event) => {
 <template>
     <Head title="Dashboard" />
     <AuthenticatedLayout>
-        <div class="py-12 flex space-x-4 px-8">
+        <div class="py-12 flex px-8">
             <div class="w-3/4">
-                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 pb-4">
                     <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                        <div class="p-6 text-gray-900 dark:text-gray-100">
+                        <div class="p-4 text-gray-900 dark:text-gray-100">
                             <TodoQuickCreateForm />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 pb-4">
+                    <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                        <div class="p-4 text-gray-900 dark:text-gray-100">
+                            <FwbInput
+                                v-model="filterForm.filter"
+                                placeholder="eg: category=Work,Shopping shared=true name=test decription=text"
+                                size="lg"
+                                @keydown="handleEnter"
+                                :disabled="todos?.data?.length === 0"
+                            >
+                                <template #suffix>
+                                    <fwb-button :disabled="filterForm.processing || todos?.data?.length === 0" @click="applyFilter">
+                                        <span v-if="filterForm.processing">Searching...</span>
+                                        <span v-else>Search</span>
+                                    </fwb-button>
+                                </template>
+                            </FwbInput>
                         </div>
                     </div>
                 </div>
@@ -77,7 +98,7 @@ const handleEnter = (event) => {
                 <div>
                     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                         <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                            <div v-if="!todos || todos?.length === 0" class="p-6 text-gray-900 dark:text-gray-100">
+                            <div v-if="!todos.data  || todos.data ?.length === 0" class="p-6 text-gray-900 dark:text-gray-100">
                                 <div>
                                     <p>
                                         You have no tasks yet.
@@ -85,29 +106,13 @@ const handleEnter = (event) => {
                                 </div>
                             </div>
                             <div v-else>
-                                <FwbInput
-                                    v-model="filterForm.filter"
-                                    placeholder="category=Work,Shopping shared=true name=test decription=text"
-                                    size="lg"
-                                    class="px-6"
-                                    @keydown="handleEnter"
-                                >
-                                    <template #suffix>
-                                        <fwb-button :disabled="filterForm.processing" @click="applyFilter">
-                                            <span v-if="filterForm.processing">Searching...</span>
-                                            <span v-else>Search</span>
-                                        </fwb-button>
-                                    </template>
-                                </FwbInput>
-
                                 <TodoTableActive :todos="todos.data" :categories="categories.data"/>
-                                <div class="flex justify-center">
+                                <div class="flex justify-center pt-6">
                                     <template v-for="(link) in todos.meta.links">
                                         <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded" v-html="link.label" />
                                         <Link v-else class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500" :class="{ 'bg-white': link.active }" :href="link.url" v-html="link.label" />
                                     </template>
                                 </div>
-
                             </div>
                         </div>
                     </div>
