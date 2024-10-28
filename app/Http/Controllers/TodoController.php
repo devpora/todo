@@ -10,6 +10,7 @@ use App\Http\Resources\CategoryResource;
 use App\Http\Resources\TodoResource;
 use App\Models\Todo;
 use App\Models\User;
+use App\Notifications\TodoEditedNotification;
 use App\Notifications\TodoNotification;
 use App\Notifications\TodoSharedNotification;
 use App\Repositories\CategoryRepository;
@@ -151,15 +152,22 @@ class TodoController extends Controller
 
                 $existingEmails = $sharedTodo->emails()->pluck('email')->toArray();
                 $newEmails = $request->getSharedEmails();
-                $emailsToAdd = array_diff($newEmails, $existingEmails);
+                $notificationShared = array_diff($newEmails, $existingEmails);
+                $notificationEdit = array_intersect($newEmails, $existingEmails);
 
                 $sharedTodo->emails()->whereNotIn('email', $newEmails)->delete();
 
-                $this->sharedTodoEmailRepository->addEmails($sharedTodo, $emailsToAdd);
+                $this->sharedTodoEmailRepository->addEmails($sharedTodo, $notificationShared);
 
-                foreach ($emailsToAdd as $email) {
+                // Notification for new shared user
+                foreach ($notificationShared as $email) {
                     Notification::route('mail', $email)
                         ->notify(new TodoSharedNotification($request->getName(), $request->getSharedLink(), auth()->user()));
+                }
+                // Notification about edit for existing user
+                foreach ($notificationEdit as $email) {
+                    Notification::route('mail', $email)
+                        ->notify(new TodoEditedNotification($request->getName(), $request->getSharedLink(), auth()->user()));
                 }
             }
         } else {

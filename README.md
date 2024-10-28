@@ -1,11 +1,5 @@
 # TODO app
 
-## EN
-All data is in separate branches
-
-## SK
-Všetky dáta sú v samostatných vetvách
-
 ---
 ## en
 
@@ -47,9 +41,6 @@ php artisan migrate # - creating tables in the database
 php artisan serve # - start development server on http://localhost:8000
 npm run dev # - start development server on http://localhost:5173
 ```
-
-## Release notes
-- v001 - Init commit
 
 ## Other:
 ### Documentation:
@@ -96,9 +87,6 @@ php artisan migrate # - vytvorenie tabuliek v databáze
 php artisan serve # - spustenie servera na http://localhost:8000
 npm run dev # - spustenie FE na http://localhost:5173
 ```
-
-## Poznámky k vydaniu
-- v001 - Úvodný commit
 
 ## Ostatné:
 ### Dokumentácia:
