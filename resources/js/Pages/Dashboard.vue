@@ -53,6 +53,10 @@ const applyFilter = () => {
         only: ['todos'],
     });
 };
+const clearFilter = () => {
+    filterForm.filter = ''
+    applyFilter()
+}
 const handleEnter = (event) => {
     if (event.key === 'Enter') {
         applyFilter();
@@ -81,13 +85,18 @@ const handleEnter = (event) => {
                                 placeholder="eg: category=Work,Shopping shared=true name=test decription=text"
                                 size="lg"
                                 @keydown="handleEnter"
-                                :disabled="todos?.data?.length === 0"
                             >
                                 <template #suffix>
-                                    <fwb-button :disabled="filterForm.processing || todos?.data?.length === 0" @click="applyFilter">
-                                        <span v-if="filterForm.processing">Searching...</span>
-                                        <span v-else>Search</span>
-                                    </fwb-button>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <fwb-button :disabled="filterForm.processing" @click="applyFilter">
+                                            <span v-if="filterForm.processing">Searching...</span>
+                                            <span v-else>Search</span>
+                                        </fwb-button>
+                                        <fwb-button :disabled="filterForm.processing" @click="clearFilter" class="bg-red-400 hover:bg-red-600">
+                                            <span>Clear</span>
+                                        </fwb-button>
+                                    </div>
+
                                 </template>
                             </FwbInput>
                         </div>
