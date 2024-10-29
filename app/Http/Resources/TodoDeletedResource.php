@@ -19,8 +19,7 @@ class TodoDeletedResource extends JsonResource
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
-            'deleted_at' => Carbon::parse( $this->getDeletedAt())->toDateTimeString()
+            'deleted_at' => Carbon::parse($this->getDeletedAt())->toDateTimeString(),
         ];
     }
 }
-

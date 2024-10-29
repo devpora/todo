@@ -17,8 +17,8 @@ use App\Repositories\TodoRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Notification;
 
-class TodoService{
-
+class TodoService
+{
     public function __construct(
         private TodoRepository $todoRepository,
         private SharedTodoRepository $sharedTodoRepository,
@@ -40,7 +40,7 @@ class TodoService{
             });
         }
 
-        if (!is_null($request->getShared())) {
+        if (! is_null($request->getShared())) {
             $shared = filter_var($request->getShared(), FILTER_VALIDATE_BOOLEAN);
             if ($shared) {
                 $query->whereHas('sharedTodo');
@@ -180,15 +180,15 @@ class TodoService{
         $todo->categories()->sync($request->getCategory());
     }
 
-
     private function handleSharingLogic(Todo $todo, UpdateRequest $request): void
     {
         $sharedTodo = $this->sharedTodoRepository->findByTodoId($todo->getId());
 
-        if (!$request->isShared()) {
+        if (! $request->isShared()) {
             if ($sharedTodo) {
                 $this->sharedTodoRepository->delete($sharedTodo);
             }
+
             return;
         }
 
@@ -206,7 +206,7 @@ class TodoService{
 
     private function handlePublicSharing($sharedTodo, Todo $todo, UpdateRequest $request): void
     {
-        if (!$sharedTodo) {
+        if (! $sharedTodo) {
             $sharedTodo = $this->sharedTodoRepository->create([
                 'todo_id' => $todo->getId(),
                 'share_link' => $request->getSharedLink(),
@@ -224,7 +224,7 @@ class TodoService{
 
     private function handlePrivateSharing($sharedTodo, Todo $todo, UpdateRequest $request): void
     {
-        if (!$sharedTodo) {
+        if (! $sharedTodo) {
             $sharedTodo = $this->sharedTodoRepository->create([
                 'todo_id' => $todo->getId(),
                 'share_link' => $request->getSharedLink(),
@@ -274,5 +274,4 @@ class TodoService{
                 ->notify(new TodoEditedNotification($todoName, $sharedLink, $currentUser));
         }
     }
-
 }

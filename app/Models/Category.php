@@ -8,16 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
+
     protected $fillable = ['name'];
 
     public function getId(): int
     {
         return $this->id;
     }
+
     public function getName(): string
     {
         return $this->name;
     }
+
     public function setName(string $value): void
     {
         $this->name = $value;

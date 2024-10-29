@@ -24,4 +24,3 @@ class TodoSharedResource extends JsonResource
         ];
     }
 }
-

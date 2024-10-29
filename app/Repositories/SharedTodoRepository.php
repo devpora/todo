@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\SharedTodo;
@@ -23,6 +24,7 @@ class SharedTodoRepository
     public function update(SharedTodo $sharedTodo, array $data)
     {
         $sharedTodo->update($data);
+
         return $sharedTodo;
     }
 
@@ -30,5 +32,4 @@ class SharedTodoRepository
     {
         $sharedTodo->delete();
     }
-
 }

@@ -28,6 +28,7 @@ class QueryRequest extends FormRequest
     {
         return $this->name;
     }
+
     public function getDescription(): ?string
     {
         return $this->description;

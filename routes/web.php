@@ -7,7 +7,6 @@ use App\Http\Controllers\TodoController;
 use App\Models\Todo;
 use Illuminate\Support\Facades\Route;
 
-
 Route::get('/shared/public/{slug}', [SharedTodoController::class, 'showPublic'])->name('shared.public');
 
 Route::middleware('auth')->group(function () {
@@ -22,7 +21,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/todo/update/{todo}', [TodoController::class, 'update'])->name('todo.update');
     Route::post('/todo-completed/{todo}', [TodoController::class, 'completed']);
     Route::delete('/todo/{todo}', [TodoController::class, 'destroy']);
-
 
     Route::get('/shared/private/{slug}', [SharedTodoController::class, 'showPrivate'])->name('shared.private');
 

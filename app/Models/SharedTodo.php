@@ -12,6 +12,7 @@ class SharedTodo extends Model
     {
         return $this->id;
     }
+
     public function getTodoId(): int
     {
         return $this->todo_id;

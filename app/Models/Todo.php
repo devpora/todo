@@ -13,32 +13,39 @@ class Todo extends Model
     use SoftDeletes;
 
     protected $table = 'todos';
+
     protected $fillable = ['name', 'description', 'category_id', 'user_id', 'is_completed'];
 
     public function getId(): int
     {
         return $this->id;
     }
+
     public function getName(): string
     {
         return $this->name;
     }
+
     public function getDescription(): ?string
     {
         return $this->description;
     }
+
     public function getCategoryId(): int
     {
         return $this->category_id;
     }
+
     public function getUserId(): int
     {
         return $this->user_id;
     }
+
     public function isCompleted(): bool
     {
         return $this->is_completed;
     }
+
     public function getDeletedAt(): ?Carbon
     {
         return $this->deleted_at;
@@ -48,15 +55,16 @@ class Todo extends Model
     {
         $this->name = $value;
     }
+
     public function setDescription(?string $value): void
     {
         $this->description = $value;
     }
+
     public function setIsCompleted(bool $value): void
     {
         $this->is_completed = $value;
     }
-
 
     public function user()
     {
@@ -72,6 +80,4 @@ class Todo extends Model
     {
         return $this->hasOne(SharedTodo::class);
     }
-
 }
-

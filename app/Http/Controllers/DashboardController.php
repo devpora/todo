@@ -14,6 +14,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class DashboardController extends Controller
 {
     use AuthorizesRequests;
+
     public function __construct(
         private TodoService $todoService,
     ) {}
@@ -27,6 +28,7 @@ class DashboardController extends Controller
 
         return TodoResource::collection($activeTodos);
     }
+
     public function getShared(): AnonymousResourceCollection
     {
         /** @var User $user */

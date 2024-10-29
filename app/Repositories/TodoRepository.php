@@ -2,12 +2,13 @@
 
 namespace App\Repositories;
 
-use App\Models\Todo;
 use App\Models\SharedTodo;
+use App\Models\Todo;
 
 class TodoRepository
 {
     protected $sharedTodoRepository;
+
     protected $sharedTodoEmailRepository;
 
     public function __construct(SharedTodoRepository $sharedTodoRepository, SharedTodoEmailRepository $sharedTodoEmailRepository)
@@ -24,6 +25,7 @@ class TodoRepository
     public function update(Todo $todo, array $data)
     {
         $todo->update($data);
+
         return $todo;
     }
 
@@ -54,12 +56,12 @@ class TodoRepository
 
     public function getUserTodos($user)
     {
-        return $user->todos()->orderBy('updated_at', 'DESC' );
+        return $user->todos()->orderBy('updated_at', 'DESC');
     }
 
     public function getPrivateTodos($email)
     {
-        return Todo::orderBy('updated_at', 'DESC' )->whereHas('sharedTodo.emails', function ($query) use ($email) {
+        return Todo::orderBy('updated_at', 'DESC')->whereHas('sharedTodo.emails', function ($query) use ($email) {
             $query->where('email', $email);
         });
     }
@@ -67,6 +69,7 @@ class TodoRepository
     public function getPublicTodo($slug)
     {
         $sharedTodo = SharedTodo::where('share_link', $slug)->firstOrFail();
+
         return Todo::with('categories')->findOrFail($sharedTodo->todo_id);
     }
 
@@ -85,4 +88,3 @@ class TodoRepository
         abort(403, 'You do not have access to this Todo.');
     }
 }
-

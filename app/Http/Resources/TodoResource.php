@@ -38,4 +38,3 @@ class TodoResource extends JsonResource
         ];
     }
 }
-

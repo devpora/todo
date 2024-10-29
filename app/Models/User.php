@@ -50,6 +50,7 @@ class User extends Authenticatable
     {
         return $this->id;
     }
+
     public function getEmail(): string
     {
         return $this->email;

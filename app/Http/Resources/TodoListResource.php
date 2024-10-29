@@ -21,4 +21,3 @@ class TodoListResource extends JsonResource
         ];
     }
 }
-

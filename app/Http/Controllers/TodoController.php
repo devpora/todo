@@ -4,23 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Todo\CompletedRequest;
 use App\Http\Requests\Todo\CreateRequest;
-use App\Http\Requests\Todo\QueryRequest;
 use App\Http\Requests\Todo\UpdateRequest;
 use App\Http\Resources\CategoryResource;
-use App\Http\Resources\TodoResource;
 use App\Models\Todo;
-use App\Models\User;
-use App\Notifications\TodoEditedNotification;
-use App\Notifications\TodoNotification;
-use App\Notifications\TodoSharedNotification;
 use App\Repositories\CategoryRepository;
 use App\Repositories\SharedTodoEmailRepository;
 use App\Repositories\SharedTodoRepository;
 use App\Repositories\TodoRepository;
 use App\Services\TodoService;
-use Illuminate\Support\Facades\Notification;
-use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Inertia\Inertia;
 
 class TodoController extends Controller
 {
