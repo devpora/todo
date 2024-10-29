@@ -24,51 +24,22 @@ class QueryRequest extends FormRequest
         return [];
     }
 
-    public function getFilterParams(): array
-    {
-        $filterString = $this->getFilter();
-        $params = [];
-
-        if ($filterString) {
-            $filters = explode(' ', $filterString);
-
-            foreach ($filters as $filter) {
-                if (strpos($filter, '=') !== false) {
-                    list($key, $value) = explode('=', $filter, 2);
-                    if (!empty($key) && !empty($value)) {
-                        $params[$key] = $value;
-                    }
-                }
-            }
-        }
-
-        return $params;
-    }
-    public function getFilter(): ?string
-    {
-        return $this->input('filter');
-    }
-
     public function getName(): ?string
     {
-        $params = $this->getFilterParams();
-        return $params['name'] ?? null;
+        return $this->name;
     }
     public function getDescription(): ?string
     {
-        $params = $this->getFilterParams();
-        return $params['description'] ?? null;
+        return $this->description;
     }
 
     public function getCategory(): ?string
     {
-        $params = $this->getFilterParams();
-        return $params['category'] ?? null;
+        return $this->category;
     }
 
     public function getShared(): ?bool
     {
-        $params = $this->getFilterParams();
-        return isset($params['shared']) ? filter_var($params['shared'], FILTER_VALIDATE_BOOLEAN) : null;
+        return $this->shared ? filter_var($this->shared, FILTER_VALIDATE_BOOLEAN) : null;
     }
 }

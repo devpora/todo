@@ -32,6 +32,11 @@ class TodoRepository
         $todo->delete();
     }
 
+    public function forceDelete(Todo $todo)
+    {
+        $todo->forceDelete();
+    }
+
     public function restore(Todo $todo)
     {
         $todo->restore();
@@ -42,6 +47,11 @@ class TodoRepository
         return Todo::where('user_id', $userId)->findOrFail($todoId);
     }
 
+    public function findWithTrashedByUserAndId($userId, $todoId)
+    {
+        return Todo::where('user_id', $userId)->withTrashed()->findOrFail($todoId);
+    }
+
     public function getUserTodos($user)
     {
         return $user->todos()->orderBy('updated_at', 'DESC' );
@@ -49,7 +59,7 @@ class TodoRepository
 
     public function getPrivateTodos($email)
     {
-        return Todo::whereHas('sharedTodo.emails', function ($query) use ($email) {
+        return Todo::orderBy('updated_at', 'DESC' )->whereHas('sharedTodo.emails', function ($query) use ($email) {
             $query->where('email', $email);
         });
     }

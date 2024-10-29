@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/todo-completed/{id}', [TodoController::class, 'completed']);
     Route::post('/todo-restore/{id}', [TodoController::class, 'restore'])->name('todo.restore');
     Route::delete('/todo/{id}', [TodoController::class, 'destroy'])->name('todo.destroy');
+    Route::delete('/todo-force/{id}', [TodoController::class, 'forceDestroy'])->name('todo.forceDestroy');
 
     Route::get('/shared/private/{slug}', [SharedTodoController::class, 'showPrivate'])->name('shared.private');
 

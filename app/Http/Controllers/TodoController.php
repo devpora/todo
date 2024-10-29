@@ -37,64 +37,11 @@ class TodoController extends Controller
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function index(QueryRequest $request)
+    public function index()
     {
-        /** @var User $user */
-        $user = auth()->user();
-        $query = $this->todoRepository->getUserTodos($user)
-            ->where('is_completed', false)
-            ->whereNull('deleted_at');
-
-        if ($request->getCategory()) {
-            $categories = explode(',', $request->getCategory());
-            $categoryIds = $this->categoryRepository->getIdsByName($categories);
-            $query->whereHas('categories', function ($q) use ($categoryIds) {
-                $q->whereIn('categories.id', $categoryIds);
-            });
-        }
-
-        if (!is_null($request->getShared())) {
-            $shared = filter_var($request->getShared(), FILTER_VALIDATE_BOOLEAN);
-            if ($shared) {
-                $query->whereHas('sharedTodo');
-            } else {
-                $query->whereDoesntHave('sharedTodo');
-            }
-        }
-
-        if ($request->getName()) {
-            $name = $request->getName();
-            $query->where(function ($q) use ($name) {
-                $q->where('name', 'like', "%{$name}%");
-            });
-        }
-        if ($request->getDescription()) {
-            $description = $request->getDescription();
-            $query->where(function ($q) use ($description) {
-                $q->where('description', 'like', "%{$description}%");
-            });
-        }
-
-        $activeTodos = $query->paginate(10);
-
-        $completedTodos = $this->todoRepository->getUserTodos($user)
-            ->where('is_completed', true)
-            ->whereNull('deleted_at')
-            ->paginate(10);
-
-        $deletedTodos = $this->todoRepository->getUserTodos($user)
-            ->onlyTrashed()
-            ->paginate(10);
-
-        $sharedTodos = $this->todoRepository->getPrivateTodos($user->getEmail())->paginate(10);
-
         $categories = $this->categoryRepository->getAllCategories();
 
         return Inertia::render('Dashboard', [
-            'todos' => TodoResource::collection($activeTodos),
-            'sharedTodos' => TodoResource::collection($sharedTodos),
-            'completedTodos' => TodoResource::collection($completedTodos),
-            'deletedTodos' => TodoResource::collection($deletedTodos),
             'categories' => CategoryResource::collection($categories),
         ]);
     }
@@ -213,6 +160,27 @@ class TodoController extends Controller
         $user = auth()->user();
         Notification::route('mail', $user->getEmail())
             ->notify(new TodoNotification('Todo ' . $todo->getName() . ' was deleted.'));
+
+        return redirect()->route('dashboard')->with('success', 'ToDo deleted successfully!');
+    }
+
+    public function forceDestroy($id)
+    {
+        $todo = $this->todoRepository->findWithTrashedByUserAndId(auth()->id(), $id);
+        $this->authorize('delete', $todo);
+        $sharedTodo = $this->sharedTodoRepository->findByTodoId($todo->id);
+
+        if ($sharedTodo) {
+            $this->sharedTodoEmailRepository->deleteBySharedTodoId($sharedTodo->id);
+            $this->sharedTodoRepository->delete($sharedTodo);
+        }
+
+        $this->todoRepository->forceDelete($todo);
+
+        /** @var User $user */
+        $user = auth()->user();
+        Notification::route('mail', $user->getEmail())
+            ->notify(new TodoNotification('Todo ' . $todo->getName() . ' has been permanently deleted.'));
 
         return redirect()->route('dashboard')->with('success', 'ToDo deleted successfully!');
     }
