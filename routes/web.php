@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SharedTodoController;
 use App\Http\Controllers\TodoController;
@@ -10,6 +11,12 @@ Route::get('/shared/public/{slug}', [SharedTodoController::class, 'showPublic'])
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [TodoController::class, 'index'])->name('dashboard');
+
+    Route::get('/todo-active', [DashboardController::class, 'getActive']);
+    Route::get('/todo-shared', [DashboardController::class, 'getShared']);
+    Route::get('/todo-completed', [DashboardController::class, 'getCompleted']);
+    Route::get('/todo-deleted', [DashboardController::class, 'getDeleted']);
+
     Route::post('/todo/quickStore', [TodoController::class, 'quickStore'])->name('todo.quickStore');
     Route::post('/todo/update/{id}', [TodoController::class, 'update'])->name('todo.update');
     Route::post('/todo-completed/{id}', [TodoController::class, 'completed']);

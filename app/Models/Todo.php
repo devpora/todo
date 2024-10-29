@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class Todo extends Model
 {
@@ -37,6 +38,10 @@ class Todo extends Model
     public function isCompleted(): bool
     {
         return $this->is_completed;
+    }
+    public function getDeletedAt(): ?Carbon
+    {
+        return $this->deleted_at;
     }
 
     public function setName(string $value): void
