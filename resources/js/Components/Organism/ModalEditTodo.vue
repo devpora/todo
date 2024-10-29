@@ -11,6 +11,7 @@ import InputAddress from "@/Components/Molecule/InputAddress.vue";
 const showToast = inject('showToast');
 
 const isShowModal = ref(false)
+const emit = defineEmits(['updated']);
 
 function closeModal () {
     isShowModal.value = false
@@ -32,7 +33,7 @@ const props = defineProps({
 const form = useForm({
     name: props.todo.name || '',
     description: props.todo.description || '',
-    category: props.todo.categories.map(category => category.id) || [],
+    category: props?.todo?.categories?.map(category => category.id) || [],
     sharedEmails: props.todo.sharedEmails || [],
     sharedLink: props.todo.sharedLink || null,
     isShared: props.todo.isShared || false,
@@ -42,9 +43,10 @@ const form = useForm({
 const submit = () => {
     form.post(route('todo.update', props.todo.id), {
         onSuccess: () => {
-            showToast('success', 'Success');
+            showToast('success', 'Todo was updated');
             closeModal()
-        },
+            emit('updated')
+        }
     });
 };
 const toggleCategory = (categoryId) => {

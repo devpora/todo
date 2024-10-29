@@ -37,7 +37,7 @@ class UpdateRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->sometimes('sharedEmails', 'required|array', function ($input) {
-            return $input->isShared && !$input->isPublic;
+            return $input->isShared && ! $input->isPublic;
         });
     }
 
@@ -45,18 +45,22 @@ class UpdateRequest extends FormRequest
     {
         return $this->name;
     }
+
     public function getDescription(): ?string
     {
         return $this->description;
     }
+
     public function getCategory(): array
     {
         return $this->category;
     }
+
     public function isShared(): bool
     {
         return $this->isShared;
     }
+
     public function isPublic(): bool
     {
         return $this->isPublic;
@@ -66,6 +70,7 @@ class UpdateRequest extends FormRequest
     {
         return $this->sharedEmails;
     }
+
     public function getSharedLink(): ?string
     {
         return $this->sharedLink;

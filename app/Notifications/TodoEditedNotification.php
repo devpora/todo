@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +11,9 @@ class TodoEditedNotification extends Notification
     use Queueable;
 
     protected $name;
+
     protected $link;
+
     protected $sender;
 
     /**
@@ -42,8 +43,8 @@ class TodoEditedNotification extends Notification
     {
         return (new MailMessage)
             ->greeting('Hi!')
-            ->line('Todo ' . $this->name . ' from ' . $this->sender->name . ' was edited.')
-            ->action('View Todo', url('/shared/private/' . $this->link))
+            ->line('Todo '.$this->name.' from '.$this->sender->name.' was edited.')
+            ->action('View Todo', url('/shared/private/'.$this->link))
             ->line('Thank you for using our application!');
     }
 

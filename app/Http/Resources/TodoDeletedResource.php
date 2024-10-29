@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Category;
+use App\Models\Todo;
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class TodoDeletedResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +15,11 @@ class CategoryResource extends JsonResource
      */
     public function toArray($request)
     {
-
-        /** @var Category $this */
+        /** @var Todo $this */
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
+            'deleted_at' => Carbon::parse($this->getDeletedAt())->toDateTimeString(),
         ];
     }
 }

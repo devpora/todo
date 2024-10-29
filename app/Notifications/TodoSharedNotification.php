@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +11,9 @@ class TodoSharedNotification extends Notification
     use Queueable;
 
     protected $name;
+
     protected $link;
+
     protected $sender;
 
     /**
@@ -42,8 +43,8 @@ class TodoSharedNotification extends Notification
     {
         return (new MailMessage)
             ->greeting('Hi!')
-            ->line('You have received a shared Todo item ' . $this->name . ' from ' . $this->sender->name)
-            ->action('View Todo', url('/shared/private/' . $this->link))
+            ->line('You have received a shared Todo item '.$this->name.' from '.$this->sender->name)
+            ->action('View Todo', url('/shared/private/'.$this->link))
             ->line('Thank you for using our application!');
     }
 

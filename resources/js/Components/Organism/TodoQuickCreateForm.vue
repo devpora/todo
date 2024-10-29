@@ -11,7 +11,7 @@ const submitForm = () => {
     form.post(route('todo.quickStore'), {
         onSuccess: () => {
             form.reset();
-            showToast('success', 'Success');
+            showToast('success', 'Todo was created');
         },
     });
 };

@@ -10,9 +10,9 @@ class CategoryRepository
     {
         return Category::all();
     }
+
     public function getIdsByName($names)
     {
         return Category::whereIn('name', $names)->pluck('id');
     }
 }
-

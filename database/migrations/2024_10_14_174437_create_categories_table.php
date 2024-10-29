@@ -19,7 +19,7 @@ return new class extends Migration
         });
 
         Artisan::call('db:seed', [
-            '--class' => \Database\Seeders\CategorySeeder::class
+            '--class' => \Database\Seeders\CategorySeeder::class,
         ]);
     }
 

@@ -1,6 +1,6 @@
 <script setup>
-import {inject, ref} from "vue";
-import {router} from "@inertiajs/vue3";
+import {inject, onMounted, ref, watch} from "vue";
+import {router, useForm} from "@inertiajs/vue3";
 import {
     FwbTable,
     FwbTableBody,
@@ -9,15 +9,19 @@ import {
     FwbTableHeadCell,
     FwbTableRow,
     FwbAvatar,
-    FwbButton, FwbCheckbox, FwbBadge
+    FwbButton, FwbCheckbox, FwbBadge, FwbPagination, FwbInput
 } from 'flowbite-vue'
 import ModalEditTodo from "@/Components/Organism/ModalEditTodo.vue";
 import ModalDeleteTodo from "@/Components/Organism/ModalDeleteTodo.vue";
+import axios from "axios";
+import AtomTableProcessing from "@/Components/atoms/AtomTableProcessing.vue";
+import AtomTableEmpty from "@/Components/atoms/AtomTableEmpty.vue";
 const showToast = inject('showToast');
 
+const emit = defineEmits(['loadTableDeleted', 'loadTableUpdated', 'loadTableCompleted']);
 const props = defineProps({
-    todos: {
-        type: Array,
+    tableRefresh: {
+        type: Number,
         required: true,
     },
     categories: {
@@ -27,26 +31,33 @@ const props = defineProps({
 });
 
 const expandedRows = ref({});
-const loading = ref(false);
+const todos = ref({
+    data: [],
+    meta: {
+        total: 0,
+    },
+    links: {}
+});
 
 const toggleRow = (todoId) => {
     expandedRows.value[todoId] = !expandedRows.value[todoId];
 };
 
 const onChangeCompleted = (todo) => {
-    loading.value = true;
+    loadingTable.value = true;
 
     router.post(`/todo-completed/${todo.id}`, {
         completed: todo.is_completed,
     },{
         onSuccess: () => {
-            showToast('success', 'Success');
+            showToast('success', 'Todo was completed');
+            emit('loadTableCompleted')
         },
         onError: () => {
             showToast('error', 'Error');
         },
         onFinish: () => {
-            loading.value = false;
+            loadingTable.value = false;
         }
     });
 };
@@ -62,9 +73,106 @@ const copyLink = async (isPublic, sharedLink) => {
     await navigator.clipboard.writeText(url + linkType + sharedLink);
     showToast('success', 'Copied');
 };
+
+const loadingTable = ref(false);
+const currentPage = ref(1);
+
+const loadData = (page = 1) => {
+    loadingTable.value = true;
+
+    axios.get(`/todo-active?page=${page}`)
+        .then((response) => {
+            todos.value = response.data;
+        })
+        .catch((error) => {
+            showToast('error', error.message);
+        })
+        .finally(() => {
+            loadingTable.value = false;
+        });
+};
+
+const filterForm = useForm({
+    filter: '',
+});
+const applyFilter = () => {
+    loadingTable.value = true;
+    const filters = filterForm.filter.split(' ');
+    const params = {};
+
+    filters.forEach(filter => {
+        const [key, value] = filter.split('=');
+        params[key] = value;
+    });
+    const queryString = new URLSearchParams(params).toString();
+    axios.get(`/todo-active?page=${currentPage.value}&${queryString}`)
+        .then((response) => {
+            todos.value = response.data
+        })
+        .catch((error) => {
+            showToast('error', error.message);
+        })
+        .finally(() => {
+            loadingTable.value = false;
+        });
+};
+const clearFilter = () => {
+    filterForm.filter = ''
+    applyFilter()
+}
+const handleEnter = (event) => {
+    if (event.key === 'Enter') {
+        applyFilter();
+    }
+};
+
+
+const deleted = () => {
+    loadData()
+    emit('loadTableDeleted')
+};
+const updated = () => {
+    loadData()
+    emit('loadTableUpdated')
+};
+
+watch(currentPage, (newPage, oldPage) => {
+    if (newPage !== oldPage) {
+        loadData(newPage);
+    }
+});
+watch(props, () => {
+    loadData();
+}, {
+    immediate:true
+});
+onMounted(() => {
+    loadData();
+});
+
 </script>
 <template>
-    <FwbTable striped>
+    <FwbInput
+        v-model="filterForm.filter"
+        placeholder="eg: category=Work,Shopping shared=true name=test decription=text"
+        size="lg"
+        @keydown="handleEnter"
+    >
+        <template #suffix>
+            <div class="grid grid-cols-2 gap-2">
+                <FwbButton :disabled="filterForm.processing" @click="applyFilter">
+                    <span v-if="filterForm.processing">Searching...</span>
+                    <span v-else>Search</span>
+                </FwbButton>
+                <FwbButton :disabled="filterForm.processing" @click="clearFilter" class="bg-red-400 hover:bg-red-600">
+                    <span>Clear</span>
+                </FwbButton>
+            </div>
+
+        </template>
+    </FwbInput>
+
+    <FwbTable striped class="border mt-4">
         <FwbTableHead>
             <FwbTableHeadCell class="w-12"></FwbTableHeadCell>
             <FwbTableHeadCell class="w-24">Completed</FwbTableHeadCell>
@@ -74,7 +182,8 @@ const copyLink = async (isPublic, sharedLink) => {
             <FwbTableHeadCell class="w-24">Action</FwbTableHeadCell>
         </FwbTableHead>
         <FwbTableBody>
-            <template v-for="todo in todos" :key="todo.id">
+            <AtomTableProcessing v-if="loadingTable"/>
+            <template v-if="todos.data && todos.data?.length > 0" v-for="todo in todos.data" :key="todo.id">
                 <FwbTableRow>
                     <FwbTableCell>
                         <FwbButton size="xs" @click="toggleRow(todo.id)" class="bg-gray-400 hover:bg-gray-500">
@@ -110,8 +219,8 @@ const copyLink = async (isPublic, sharedLink) => {
                         <span v-if="!todo.isShared">-</span>
                     </FwbTableCell>
                     <FwbTableCell class="flex gap-2">
-                        <ModalDeleteTodo :todo="todo" />
-                        <ModalEditTodo :todo="todo" :categories="categories"/>
+                        <ModalDeleteTodo :todo="todo" @deleted="deleted"/>
+                        <ModalEditTodo :todo="todo" :categories="categories" @updated="updated"/>
                     </FwbTableCell>
                 </FwbTableRow>
                 <FwbTableRow v-if="expandedRows[todo.id]">
@@ -120,10 +229,14 @@ const copyLink = async (isPublic, sharedLink) => {
                     </FwbTableCell>
                 </FwbTableRow>
             </template>
-
+            <template v-else>
+                <td colspan="6">
+                    <AtomTableEmpty />
+                </td>
+            </template>
         </FwbTableBody>
-        <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
-            <div class="loader">Processing...</div>
-        </div>
     </FwbTable>
+    <div class="flex justify-center pt-6">
+        <FwbPagination v-if="todos.meta && todos.meta.total > 5" v-model="currentPage" :total-items="todos.meta.total" :per-page="todos.meta.per_page"></FwbPagination>
+    </div>
 </template>

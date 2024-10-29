@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Category;
+use App\Models\Todo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class TodoListResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,8 +14,7 @@ class CategoryResource extends JsonResource
      */
     public function toArray($request)
     {
-
-        /** @var Category $this */
+        /** @var Todo $this */
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),

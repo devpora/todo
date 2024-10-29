@@ -9,13 +9,10 @@ use Inertia\Inertia;
 
 class SharedTodoController extends Controller
 {
+    public function __construct(
+        protected TodoRepository $todoRepository
+    ) {}
 
-    protected $todoRepository;
-
-    public function __construct(TodoRepository $todoRepository)
-    {
-        $this->todoRepository = $todoRepository;
-    }
     public function showPublic($slug)
     {
         $todo = $this->todoRepository->getPublicTodo($slug);
