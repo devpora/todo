@@ -23,7 +23,7 @@ class TodoSharedResource extends JsonResource
             'is_completed' => $this->isCompleted(),
             'deleted_at' => $this->getDeletedAt(),
             'categories' => $this->relationLoaded('categories')
-                ? CategoryResource::collection($this->categories())
+                ? CategoryResource::collection($this->categories()->getResults())
                 : null,
         ];
     }

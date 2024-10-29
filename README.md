@@ -18,6 +18,8 @@
 - PHP 8.2, Node 20.10
 - sqlite
 - Tailwind Css
+- PHP STAN, Pine (PHP CS)
+- Prettier, ESLint
 
 ## Development
 ```bash
@@ -79,6 +81,7 @@ npm run dev # - start development server on http://localhost:5173
 - sqlite
 - Tailwind Css
 - PHP STAN, Pine (PHP CS)
+- Prettier, ESLint
 
 ## Vývoj
 ```bash
