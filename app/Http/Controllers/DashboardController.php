@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Todo\QueryRequest;
 use App\Http\Resources\TodoDeletedResource;
 use App\Http\Resources\TodoListResource;
+use App\Http\Resources\TodoListSharedResource;
 use App\Http\Resources\TodoResource;
 use App\Models\User;
 use App\Services\TodoService;
@@ -35,7 +36,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         $sharedTodos = $this->todoService->getSharedTodos($user);
 
-        return TodoListResource::collection($sharedTodos);
+        return TodoListSharedResource::collection($sharedTodos);
     }
 
     public function getCompleted(): AnonymousResourceCollection
