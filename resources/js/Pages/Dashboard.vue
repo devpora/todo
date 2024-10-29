@@ -24,15 +24,18 @@ const tableDeletedRefreshKey = ref(0)
 </script>
 
 <template>
+    <p class="fixed w-full bg-red-500 text-center z-10 top-0 text-gray-900">
+        For presentation purposes only. All data is removed daily at midnight.
+    </p>
     <Head><title>Dashboard</title></Head>
     <AuthenticatedLayout>
-        <div class="py-12 flex px-8">
-            <div class="w-3/4">
-                <AtomCard>
+        <div class="py-12 flex flex-col lg:flex-row px-8 gap-2">
+            <div class="w-full lg:w-3/4">
+                <AtomCard class="mx-auto max-w-7xl">
                     <TodoQuickCreateForm />
                 </AtomCard>
 
-                <TableSections title="Active" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <TableSections title="Active" class="mx-auto max-w-7xl">
                     <TodoTableActive
                         :tableRefresh="tableActiveRefreshKey"
                         @loadTableDeleted="tableDeletedRefreshKey++"
@@ -42,7 +45,7 @@ const tableDeletedRefreshKey = ref(0)
                 </TableSections>
             </div>
 
-            <div class="w-1/4">
+            <div class="w-full lg:w-1/4">
                 <TableSections title="Shared with me">
                     <TodoTableShared :tableRefresh="tableSharedRefreshKey"/>
                 </TableSections>

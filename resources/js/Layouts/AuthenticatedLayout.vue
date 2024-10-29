@@ -35,7 +35,7 @@ provide('showToast', showToast);
 </script>
 
 <template>
-    <div>
+    <div class="mt-8 lg:mt-4">
         <FwbToast
             v-if="showToastMsg"
             :type="toastSuccess ? 'success' : 'danger'"
