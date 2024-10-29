@@ -17,6 +17,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\SharedTodoEmailRepository;
 use App\Repositories\SharedTodoRepository;
 use App\Repositories\TodoRepository;
+use App\Services\TodoService;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -24,18 +25,14 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class TodoController extends Controller
 {
     use AuthorizesRequests;
-    private $todoRepository;
-    private $sharedTodoRepository;
-    private $sharedTodoEmailRepository;
-    private $categoryRepository;
 
-    public function __construct(TodoRepository $todoRepository, SharedTodoRepository $sharedTodoRepository, SharedTodoEmailRepository $sharedTodoEmailRepository, CategoryRepository $categoryRepository)
-    {
-        $this->todoRepository = $todoRepository;
-        $this->sharedTodoRepository = $sharedTodoRepository;
-        $this->sharedTodoEmailRepository = $sharedTodoEmailRepository;
-        $this->categoryRepository = $categoryRepository;
-    }
+    public function __construct(
+        private TodoRepository $todoRepository,
+        private SharedTodoRepository $sharedTodoRepository,
+        private SharedTodoEmailRepository $sharedTodoEmailRepository,
+        private CategoryRepository $categoryRepository,
+        private TodoService $todoService,
+    ) {}
 
     public function index()
     {
@@ -48,153 +45,54 @@ class TodoController extends Controller
 
     public function quickStore(CreateRequest $request)
     {
-        Todo::create([
-            'name' => $request->getName(),
-            'user_id' => auth()->id(),
-        ]);
+        $this->todoService->createTodo($request->getName(), auth()->id());
 
-        return redirect()->route('dashboard')->with('success', 'Quick ToDo created successfully!');
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Quick ToDo created successfully!');
     }
 
-    public function update(UpdateRequest $request, $id)
+    public function update(UpdateRequest $request, Todo $todo)
     {
-        $todo = $this->todoRepository->findByUserAndId(auth()->id(), $id);
         $this->authorize('update', $todo);
-        $this->todoRepository->update($todo, [
-            'name' => $request->getName(),
-            'description' => $request->getDescription(),
-        ]);
 
-        $todo->categories()->sync($request->getCategory());
-
-        $sharedTodo = $this->sharedTodoRepository->findByTodoId($todo->id);
-
-        if ($request->isShared()) {
-            if ($request->isPublic()) {
-                if (!$sharedTodo) {
-                    $sharedTodo = $this->sharedTodoRepository->create([
-                        'todo_id' => $todo->id,
-                        'share_link' => $request->getSharedLink(),
-                        'is_public' => true,
-                    ]);
-                } else {
-                    $this->sharedTodoRepository->update($sharedTodo, [
-                        'share_link' => $request->getSharedLink(),
-                        'is_public' => true,
-                    ]);
-                }
-                $this->sharedTodoEmailRepository->deleteBySharedTodoId($sharedTodo->id);
-            } else {
-                if (!$sharedTodo) {
-                    $sharedTodo = $this->sharedTodoRepository->create([
-                        'todo_id' => $todo->id,
-                        'share_link' => $request->getSharedLink(),
-                        'is_public' => false,
-                    ]);
-                } else {
-                    $this->sharedTodoRepository->update($sharedTodo, [
-                        'is_public' => false,
-                    ]);
-                }
-
-                $existingEmails = $sharedTodo->emails()->pluck('email')->toArray();
-                $newEmails = $request->getSharedEmails();
-                $notificationShared = array_diff($newEmails, $existingEmails);
-                $notificationEdit = array_intersect($newEmails, $existingEmails);
-
-                $sharedTodo->emails()->whereNotIn('email', $newEmails)->delete();
-
-                $this->sharedTodoEmailRepository->addEmails($sharedTodo, $notificationShared);
-
-                // Notification for new shared user
-                foreach ($notificationShared as $email) {
-                    Notification::route('mail', $email)
-                        ->notify(new TodoSharedNotification($request->getName(), $request->getSharedLink(), auth()->user()));
-                }
-                // Notification about edit for existing user
-                foreach ($notificationEdit as $email) {
-                    Notification::route('mail', $email)
-                        ->notify(new TodoEditedNotification($request->getName(), $request->getSharedLink(), auth()->user()));
-                }
-            }
-        } else {
-            if ($sharedTodo) {
-                $this->sharedTodoRepository->delete($sharedTodo);
-            }
-        }
+        $this->todoService->updateTodoWithSharing($todo, $request);
 
         return redirect()->back()->with('status', 'ToDo updated successfully!');
     }
 
-    public function completed(CompletedRequest $request, $id)
+    public function completed(CompletedRequest $request, Todo $todo)
     {
-        /** @var Todo $todo */
-        $todo = auth()->user()->todos()->findOrFail($id);
         $this->authorize('update', $todo);
 
-        $todo->setIsCompleted($request->isCompleted());
-        $todo->save();
-
-        /** @var User $user */
-        $user = auth()->user();
-        Notification::route('mail', $user->getEmail())
-            ->notify(new TodoNotification('Todo ' . $todo->getName() . ($request->isCompleted() ? ' is completed' : ' is incompleted again')));
+        $this->todoService->setAsCompleted($todo, $request);
 
         return redirect()->back()->with('status', 'Todo updated');
     }
 
-    public function destroy($id)
+    public function destroy(Todo $todo)
     {
-        $todo = $this->todoRepository->findByUserAndId(auth()->id(), $id);
         $this->authorize('delete', $todo);
-        $sharedTodo = $this->sharedTodoRepository->findByTodoId($todo->id);
 
-        if ($sharedTodo) {
-            $this->sharedTodoEmailRepository->deleteBySharedTodoId($sharedTodo->id);
-            $this->sharedTodoRepository->delete($sharedTodo);
-        }
-
-        $this->todoRepository->delete($todo);
-
-        /** @var User $user */
-        $user = auth()->user();
-        Notification::route('mail', $user->getEmail())
-            ->notify(new TodoNotification('Todo ' . $todo->getName() . ' was deleted.'));
+        $this->todoService->destroy($todo);
 
         return redirect()->route('dashboard')->with('success', 'ToDo deleted successfully!');
     }
 
-    public function forceDestroy($id)
+    public function forceDestroy(Todo $todoWithTrashed)
     {
-        $todo = $this->todoRepository->findWithTrashedByUserAndId(auth()->id(), $id);
-        $this->authorize('delete', $todo);
-        $sharedTodo = $this->sharedTodoRepository->findByTodoId($todo->id);
+        $this->authorize('delete', $todoWithTrashed);
 
-        if ($sharedTodo) {
-            $this->sharedTodoEmailRepository->deleteBySharedTodoId($sharedTodo->id);
-            $this->sharedTodoRepository->delete($sharedTodo);
-        }
-
-        $this->todoRepository->forceDelete($todo);
-
-        /** @var User $user */
-        $user = auth()->user();
-        Notification::route('mail', $user->getEmail())
-            ->notify(new TodoNotification('Todo ' . $todo->getName() . ' has been permanently deleted.'));
+        $this->todoService->forceDestroy($todoWithTrashed);
 
         return redirect()->route('dashboard')->with('success', 'ToDo deleted successfully!');
     }
 
-    public function restore($id)
+    public function restore(Todo $todo)
     {
-        $todo = auth()->user()->todos()->withTrashed()->findOrFail($id);
         $this->authorize('restore', $todo);
-        $this->todoRepository->restore($todo);
 
-        /** @var User $user */
-        $user = auth()->user();
-        Notification::route('mail', $user->getEmail())
-            ->notify(new TodoNotification('Todo ' . $todo->getName() . ' was restored.'));
+        $this->todoService->restore($todo);
 
         return redirect()->route('dashboard')->with('success', 'ToDo restored successfully!');
     }
