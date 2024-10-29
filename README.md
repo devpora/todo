@@ -26,6 +26,20 @@ composer install # - install BE dependencies
 npm install # - install FE dependencies
 php artisan key:generate # - generate application key
 ```
+```bash
+# CHECK BE
+./vendor/bin/pint
+./vendor/bin/phpstan analyse
+
+# CHECK FE
+npx eslint . 
+npx prettier --check "resources/js/**/*.{js,vue,css,scss}"
+
+# FIX
+npx eslint . --fix
+npx prettier --write "resources/js/**/*.{js,vue,css,scss}"
+```
+
 Change database section in .env with your db connection data. (default sqlite)
 
 ```bash
@@ -81,9 +95,11 @@ php artisan key:generate # - vygenerovanie aplikačného kľúča
 
 # CHECK FE
 npx eslint . 
+npx prettier --check "resources/js/**/*.{js,vue,css,scss}"
 
 # FIX
 npx eslint . --fix
+npx prettier --write "resources/js/**/*.{js,vue,css,scss}"
 ```
 Upravte v .env informácie potrebné na pripojenie do databázy
 
