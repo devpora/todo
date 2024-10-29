@@ -113,7 +113,6 @@ const applyFilter = () => {
             showToast('error', error.message);
         })
         .finally(() => {
-            // console.log('finnaly')
             loadingTable.value = false;
         });
 };
