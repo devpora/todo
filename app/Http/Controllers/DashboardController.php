@@ -12,24 +12,20 @@ use App\Repositories\SharedTodoEmailRepository;
 use App\Repositories\SharedTodoRepository;
 use App\Repositories\TodoRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class DashboardController extends Controller
 {
     use AuthorizesRequests;
-    private $todoRepository;
-    private $sharedTodoRepository;
-    private $sharedTodoEmailRepository;
-    private $categoryRepository;
+    public function __construct(
+        private TodoRepository $todoRepository,
+        private SharedTodoRepository $sharedTodoRepository,
+        private SharedTodoEmailRepository $sharedTodoEmailRepository,
+        private CategoryRepository $categoryRepository,
+    )
+    {}
 
-    public function __construct(TodoRepository $todoRepository, SharedTodoRepository $sharedTodoRepository, SharedTodoEmailRepository $sharedTodoEmailRepository, CategoryRepository $categoryRepository)
-    {
-        $this->todoRepository = $todoRepository;
-        $this->sharedTodoRepository = $sharedTodoRepository;
-        $this->sharedTodoEmailRepository = $sharedTodoEmailRepository;
-        $this->categoryRepository = $categoryRepository;
-    }
-
-    public function getActive(QueryRequest $request)
+    public function getActive(QueryRequest $request): AnonymousResourceCollection
     {
         /** @var User $user */
         $user = auth()->user();
@@ -72,7 +68,7 @@ class DashboardController extends Controller
 
         return TodoResource::collection($activeTodos);
     }
-    public function getShared()
+    public function getShared(): AnonymousResourceCollection
     {
         /** @var User $user */
         $user = auth()->user();
@@ -84,7 +80,7 @@ class DashboardController extends Controller
         return TodoListResource::collection($sharedTodos);
     }
 
-    public function getCompleted()
+    public function getCompleted(): AnonymousResourceCollection
     {
         /** @var User $user */
         $user = auth()->user();
@@ -98,7 +94,7 @@ class DashboardController extends Controller
         return TodoListResource::collection($sharedTodos);
     }
 
-    public function getDeleted()
+    public function getDeleted(): AnonymousResourceCollection
     {
         /** @var User $user */
         $user = auth()->user();
