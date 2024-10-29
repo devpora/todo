@@ -1,11 +1,11 @@
 <script setup>
-const props = defineProps({
+defineProps({
     title: {
         type: String,
         required: true,
     },
 });
-defineEmits('clicked')
+const emit = defineEmits('clicked')
 </script>
 <template>
     <div class="mb-6">

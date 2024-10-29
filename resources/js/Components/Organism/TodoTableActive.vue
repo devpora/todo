@@ -164,7 +164,7 @@ onMounted(() => {
                     <span v-if="filterForm.processing">Searching...</span>
                     <span v-else>Search</span>
                 </FwbButton>
-                <FwbButton :disabled="filterForm.processing" @click="clearFilter" class="bg-red-400 hover:bg-red-600">
+                <FwbButton :disabled="filterForm.processing" class="bg-red-400 hover:bg-red-600" @click="clearFilter">
                     <span>Clear</span>
                 </FwbButton>
             </div>
@@ -183,10 +183,10 @@ onMounted(() => {
         </FwbTableHead>
         <FwbTableBody>
             <AtomTableProcessing v-if="loadingTable"/>
-            <template v-if="todos.data && todos.data?.length > 0" v-for="todo in todos.data" :key="todo.id">
+            <template v-for="todo in todos.data" v-if="todos.data && todos.data?.length > 0" :key="todo.id">
                 <FwbTableRow>
                     <FwbTableCell>
-                        <FwbButton size="xs" @click="toggleRow(todo.id)" class="bg-gray-400 hover:bg-gray-500">
+                        <FwbButton size="xs" class="bg-gray-400 hover:bg-gray-500" @click="toggleRow(todo.id)">
                             {{ expandedRows[todo.id] ? '-' : '+' }}
                         </FwbButton>
                     </FwbTableCell>
@@ -199,7 +199,7 @@ onMounted(() => {
                         <FwbBadge v-for="category in todo.categories">{{ category.name }}</FwbBadge>
                     </FwbTableCell>
                     <FwbTableCell>
-                    <span v-if="todo.isShared" @click="copyLink(todo.isPublic, todo.sharedLink)" class="hover:cursor-pointer">
+                    <span v-if="todo.isShared" class="hover:cursor-pointer" @click="copyLink(todo.isPublic, todo.sharedLink)">
                         {{ todo.isPublic ? 'Public Link' : 'Private Link' }}
                     </span>
                         <div v-if="todo.isShared && !todo.isPublic">

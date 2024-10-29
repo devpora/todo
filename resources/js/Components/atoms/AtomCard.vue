@@ -1,6 +1,5 @@
 <script setup>
-const emit = defineEmits(['clicked']);
-const props = defineProps({
+defineProps({
     loading: {
         type: Boolean,
         default: false,

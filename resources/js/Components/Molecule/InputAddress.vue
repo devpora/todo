@@ -31,11 +31,11 @@ const removeEmail = (index) => {
     <div class="flex flex-col pb-2">
         <input
             id="email"
-            type="email"
             v-model="inputEmail"
-            @keyup.enter="addEmail"
+            type="email"
             class="mt-1 block w-full border rounded-md p-2"
             placeholder="Add email and press Enter"
+            @keyup.enter="addEmail"
         />
     </div>
 
@@ -46,7 +46,7 @@ const removeEmail = (index) => {
             class="bg-blue-100 text-blue-800 px-2 py-1 rounded-md flex items-center space-x-2"
         >
       <span>{{ email }}</span>
-      <span @click="removeEmail(index)" class="text-red-500 hover:text-red-700 hover:cursor-pointer">
+      <span class="text-red-500 hover:text-red-700 hover:cursor-pointer" @click="removeEmail(index)">
         &times;
       </span>
     </span>

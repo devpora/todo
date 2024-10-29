@@ -1,6 +1,6 @@
 <script setup>
 const emit = defineEmits(['clicked']);
-const props = defineProps({
+defineProps({
     loading: {
         type: Boolean,
         default: false,
@@ -17,8 +17,8 @@ const props = defineProps({
 
     <div
         v-else
-        @click="emit('clicked')"
-        class="size-4 hover:scale-125 hover:cursor-pointer">
+        class="size-4 hover:scale-125 hover:cursor-pointer"
+        @click="emit('clicked')">
         <slot></slot>
     </div>
 </template>

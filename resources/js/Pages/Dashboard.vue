@@ -10,7 +10,7 @@ import TableSections from "@/Components/Organism/TableSections.vue";
 import {ref} from "vue";
 import AtomCard from "@/Components/atoms/AtomCard.vue";
 
-const props = defineProps({
+defineProps({
     categories: {
         type: Array,
         required: true,
@@ -38,10 +38,10 @@ const tableDeletedRefreshKey = ref(0)
                 <TableSections title="Active" class="mx-auto max-w-7xl">
                     <TodoTableActive
                         :tableRefresh="tableActiveRefreshKey"
+                        :categories="categories.data"
                         @loadTableDeleted="tableDeletedRefreshKey++"
                         @loadTableUpdated="tableSharedRefreshKey++"
-                        @loadTableCompleted="tableCompletedRefreshKey++"
-                        :categories="categories.data"/>
+                        @loadTableCompleted="tableCompletedRefreshKey++"/>
                 </TableSections>
             </div>
 

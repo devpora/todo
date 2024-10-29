@@ -3,7 +3,7 @@ const model = defineModel({
     type: String,
     required: false ,
 });
-const props = defineProps({
+defineProps({
     rows: {
         type: Number,
         default: 3,

@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-const props = defineProps({
+defineProps({
     todo: {
         type: Object,
         required: true,
@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <Head title="Shared Todo" />
+    <Head><title>Shared Todo</title></Head>
     <GuestLayout>
         <div class="container mx-auto">
             <div v-if="todo.data">

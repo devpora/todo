@@ -78,7 +78,7 @@ onMounted(() => {
     <FwbTable striped class="border">
         <AtomTableProcessing v-if="loadingTable"/>
         <FwbTableBody>
-            <template v-if="todos.data && todos.data?.length > 0" v-for="todo in todos.data" :key="todo.id">
+            <template v-for="todo in todos.data" v-if="todos.data && todos.data?.length > 0" :key="todo.id">
                 <FwbTableRow>
                     <FwbTableCell class="w-12">
                         <ActionImage :loading="todo.loading" @clicked="restore(todo)">
@@ -91,7 +91,7 @@ onMounted(() => {
                     <FwbTableCell class="!text-left">{{todo.name}}</FwbTableCell>
                     <FwbTableCell class="w-24 text-xs !p-2">{{todo.deleted_at}}</FwbTableCell>
                     <FwbTableCell class="w-12 text-xs !text-end">
-                        <ModalDeleteForceTodo @loadTable="loadData" :todo="todo" />
+                        <ModalDeleteForceTodo :todo="todo" @loadTable="loadData" />
                     </FwbTableCell>
                 </FwbTableRow>
             </template>

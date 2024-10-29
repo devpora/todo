@@ -80,7 +80,7 @@ onMounted(() => {
     <FwbTable striped class="border">
         <AtomTableProcessing v-if="loadingTable"/>
         <FwbTableBody>
-            <template v-if="todos.data && todos.data?.length > 0" v-for="todo in todos.data" :key="todo.id">
+            <template v-for="todo in todos.data" v-if="todos.data && todos.data?.length > 0" :key="todo.id">
                 <FwbTableRow>
                     <FwbTableCell class="w-12">
                         <FwbCheckbox v-model="todo.is_completed" @change="() => onChangeCompleted(todo)"/>
