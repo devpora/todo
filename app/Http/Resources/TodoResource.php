@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Models\SharedTodo;
+use App\Models\SharedTodoEmail;
+use App\Models\Todo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TodoResource extends JsonResource
@@ -13,27 +16,33 @@ class TodoResource extends JsonResource
      */
     public function toArray($request)
     {
+        /** @var Todo $this */
+        $isShared = (bool) $this->sharedTodo()->getResults();
+        /** @var SharedTodo|null $sharedTodo */
+        $sharedTodo = $this->sharedTodo()->getResults();
+        $emailsCollection = $sharedTodo ? $sharedTodo->emails()->get() : collect();
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'is_completed' => (bool) $this->is_completed,
-            'isShared' => (bool) $this->sharedTodo,
-            'isPublic' => $this->sharedTodo ? (bool) $this->sharedTodo->is_public : false,
-            'sharedLink' => $this->sharedTodo ? $this->sharedTodo->share_link : null,
-            'categories' => CategoryResource::collection($this->categories),
-            'emails' => $this->sharedTodo
-                ? $this->sharedTodo->emails->take(5)->map(function ($email) {
-                    return ['id' => $email->id, 'email' => $email->email];
-                })
-                : null,
-            'sharedEmails' => $this->sharedTodo
-                ? $this->sharedTodo->emails->map(function ($email) {
-                    return $email->email;
-                })
-                : [],
-            'userCounter' => $this->sharedTodo && $this->sharedTodo->emails->count() > 5
-                ? $this->sharedTodo->emails->count() - 5
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'is_completed' => $this->isCompleted(),
+            'isShared' => $isShared,
+            'isPublic' => $isShared && $sharedTodo->isPublic(),
+            'sharedLink' => $isShared ? $sharedTodo->getShareLink() : null,
+            'categories' => CategoryResource::collection($this->categories()->getResults()),
+            'emails' => $emailsCollection->take(5)->map(function ($email) {
+                /** @var SharedTodoEmail $email */
+                return [
+                    'id' => $email->getId(),
+                    'email' => $email->getEmail(),
+                ];
+            }),
+            'sharedEmails' => $emailsCollection->map(function ($email) {
+                return $email->email;
+            }),
+            'userCounter' => $emailsCollection->count() > 5
+                ? $emailsCollection->count() - 5
                 : null,
         ];
     }

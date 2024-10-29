@@ -18,7 +18,17 @@ class SharedTodo extends Model
         return $this->todo_id;
     }
 
-    public function emails()
+    public function getShareLink(): ?string
+    {
+        return $this->share_link;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->is_public;
+    }
+
+    public function emails(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SharedTodoEmail::class);
     }

@@ -36,8 +36,8 @@ const loadData = (page = 1) => {
         .then((response) => {
             todos.value = response.data;
         })
-        .catch(() => {
-            showToast('error', 'Error in loadingTable Shared data');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             loadingTable.value = false;

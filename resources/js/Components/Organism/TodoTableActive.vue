@@ -84,8 +84,8 @@ const loadData = (page = 1) => {
         .then((response) => {
             todos.value = response.data;
         })
-        .catch(() => {
-            showToast('error', 'Error in loadingTable Shared data');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             loadingTable.value = false;
@@ -109,9 +109,8 @@ const applyFilter = () => {
         .then((response) => {
             todos.value = response.data
         })
-        .catch(() => {
-            console.log('catch')
-            showToast('error', 'Error in loading data');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             // console.log('finnaly')

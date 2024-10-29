@@ -61,16 +61,18 @@ class TodoRepository
 
     public function getPrivateTodos($email)
     {
-        return Todo::orderBy('updated_at', 'DESC')->whereHas('sharedTodo.emails', function ($query) use ($email) {
-            $query->where('email', $email);
-        });
+        return Todo::orderBy('updated_at', 'DESC')
+            ->whereHas('sharedTodo.emails', function ($query) use ($email) {
+                $query->where('email', $email);
+            });
     }
 
     public function getPublicTodo($slug)
     {
+        /** @var SharedTodo $sharedTodo */
         $sharedTodo = SharedTodo::where('share_link', $slug)->firstOrFail();
 
-        return Todo::with('categories')->findOrFail($sharedTodo->todo_id);
+        return Todo::with('categories')->findOrFail($sharedTodo->getTodoId());
     }
 
     public function getPrivateTodo($slug, $email)

@@ -35,8 +35,8 @@ const restore = (todo) => {
         .then(() => {
             loadData()
         })
-        .catch(() => {
-            showToast('error', 'Error in restore Todo');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             todo.loading = false;
@@ -50,8 +50,8 @@ const loadData = (page = 1) => {
         .then((response) => {
             todos.value = response.data;
         })
-        .catch(() => {
-            showToast('error', 'Error in loading Deleted data');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             loadingTable.value = false;

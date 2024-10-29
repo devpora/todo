@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
 
 class Todo extends Model
 {
@@ -29,11 +29,6 @@ class Todo extends Model
     public function getDescription(): ?string
     {
         return $this->description;
-    }
-
-    public function getCategoryId(): int
-    {
-        return $this->category_id;
     }
 
     public function getUserId(): int
@@ -71,12 +66,12 @@ class Todo extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function categories()
+    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_todo');
     }
 
-    public function sharedTodo()
+    public function sharedTodo(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(SharedTodo::class);
     }

@@ -37,8 +37,8 @@ const onChangeCompleted = (todo) => {
             loadData()
             emit('loadTableActive')
         })
-        .catch(() => {
-            showToast('error', 'Error in set todo as Uncompleted');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             loadingTable.value = false;
@@ -52,8 +52,8 @@ const loadData = (page = 1) => {
         .then((response) => {
             todos.value = response.data;
         })
-        .catch(() => {
-            showToast('error', 'Error in loadingTable Completed data');
+        .catch((error) => {
+            showToast('error', error.message);
         })
         .finally(() => {
             loadingTable.value = false;

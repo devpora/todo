@@ -8,9 +8,6 @@ use App\Http\Requests\Todo\UpdateRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Todo;
 use App\Repositories\CategoryRepository;
-use App\Repositories\SharedTodoEmailRepository;
-use App\Repositories\SharedTodoRepository;
-use App\Repositories\TodoRepository;
 use App\Services\TodoService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
@@ -20,9 +17,6 @@ class TodoController extends Controller
     use AuthorizesRequests;
 
     public function __construct(
-        private TodoRepository $todoRepository,
-        private SharedTodoRepository $sharedTodoRepository,
-        private SharedTodoEmailRepository $sharedTodoEmailRepository,
         private CategoryRepository $categoryRepository,
         private TodoService $todoService,
     ) {}
